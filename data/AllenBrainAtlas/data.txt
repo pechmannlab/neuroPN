@@ -1,0 +1,9 @@
+All raw data files were obtained from the Allen Brain Map (https://portal.brain-map.org) with appreciation for this resource. To replicate the analyses of the present project, the following files have to be downloaded into this folder:
+
+From https://portal.brain-map.org/atlases-and-data/rnaseq/human-multiple-cortical-areas-smart-seq download:  
+- the file linked under "Exonic Reads Expression Matrix", and save it as "MCA_exon.csv"
+- the file linked under "Table of cell metadata", and save it as "MCA_metadata.csv"
+
+From https://portal.brain-map.org/atlases-and-data/rnaseq/comparative-lgn download and unzip all data, and copy the files with filenames ending in "*_LGN_2021_genes-rows.csv", "*_LGN_2021_exon-matrix.csv", and "*_LGN_2021_metadata.csv" into this folder 
+
+
