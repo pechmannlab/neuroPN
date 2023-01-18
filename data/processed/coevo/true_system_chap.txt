@@ -1,0 +1,3 @@
+"CCT/TRiC_system" "HSP70_system" "HSP90_system" "sHSP_system"
+2414 4420 3205 542
+254 483 322 65
