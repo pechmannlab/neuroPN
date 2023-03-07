@@ -352,16 +352,14 @@ def parse_heatmap(avrgEXP, EXP, metaDF, suffixOUT):
     list_columns = []
     rel_data = np.array(resultDF)
     # cluster columns based on full expression data
-    for current_sel in [sel_exc, sel_inh, sel_non]:
+    for ix, current_sel in enumerate([sel_exc, sel_inh, sel_non]):
         dat = rel_data[:,current_sel]
         dat = np.transpose(dat)
         model = AgglomerativeClustering(n_clusters=np.shape(dat)[0], affinity='cosine', linkage='average', compute_full_tree=True)
         model.fit(dat)
         labels = model.labels_
-
         current_list = np.array(list_avrg)[current_sel]
         list_columns += list(current_list[labels])
-
 
     rel_dataDF = resultDF.loc[list(EXP.index)]
     data = np.array(rel_dataDF)
@@ -383,6 +381,51 @@ def parse_heatmap(avrgEXP, EXP, metaDF, suffixOUT):
    
     rel_dataDF.to_csv("../data/processed/heatmap_"+str(suffixOUT)+".txt", header=True, index=True, sep='\t')
 
+    return rel_dataDF
+
+
+#--------------------------------------------------------------------
+def summary_heatmap(HMAP, metaDF, suffixOUT):
+    """
+    bla
+    """
+
+    list_columns = list(HMAP.columns)
+
+    sel_exc = np.zeros(( len(list_columns) ), dtype=bool)
+    sel_inh = np.zeros(( len(list_columns) ), dtype=bool)
+    sel_non = np.zeros(( len(list_columns) ), dtype=bool)
+
+    for ix, i in enumerate(list_columns):
+        if i in list(metaDF['cluster']):
+            current_type = list(metaDF[metaDF['cluster']==i]['type'])[0]
+            if current_type == "Exc":
+                sel_exc[ix] = True
+            elif current_type == "Inh":
+                sel_inh[ix] = True
+            else:
+                sel_non[ix] = True
+
+    data_exc = np.array(HMAP)[:,sel_exc]
+    data_inh = np.array(HMAP)[:,sel_inh]
+    data_non = np.array(HMAP)[:,sel_non]
+
+ 
+
+    exc_up = np.around(np.nansum(data_exc > 2, 1)/ np.shape(data_exc)[1] * 100, 2)       # pct without nan vals
+    exc_do = np.around(np.nansum(data_exc < 0.5, 1)/np.shape(data_exc)[1] * 100, 2)
+    inh_up = np.around(np.nansum(data_inh > 2, 1)/np.shape(data_inh)[1] * 100, 2)
+    inh_do = np.around(np.nansum(data_inh < 0.5, 1)/np.shape(data_inh)[1] * 100, 2)
+    non_up = np.around(np.nansum(data_non > 2, 1)/np.shape(data_non)[1] * 100, 2)
+    non_do = np.around(np.nansum(data_non < 0.5, 1)/np.shape(data_non)[1] * 100, 2)
+
+
+    res = pd.DataFrame({'exc_up': list(exc_up), 'exc_down': list(exc_do), 
+        'inh_up': list(inh_up), 'inh_down': list(inh_do), 
+        'non_up': list(non_up), 'non_do': list(non_do)}, index=list(HMAP.index))
+    print(res)
+    
+    res.to_csv("../data/processed/log2fc_sig_"+str(suffixOUT)+".txt", header=True, index=True, sep='\t')
 
 
 #--------------------------------------------------------------------
@@ -449,14 +492,18 @@ if __name__ == '__main__':
     variab = pd.read_csv("../data/processed/cluster_variable.txt", header=0, index_col=0, sep='\t')
 
 
+    print("computing now")
     ## COMPUTE FUNCTIONS
     meta_clusters = parse_meta(meta_merged, meta_human, meta_mca)
     exp_channels, exp_synapse, exp_chap, exp_ub = filterbylists(avrg_exp, variab, list_channels, list_synapse, list_chap, list_ub)
 
     diffexp_pairwise(data_merged, list(avrg_exp.index), [exp_channels, exp_synapse, exp_chap, exp_ub], meta_merged, meta_clusters, ['Ch', 'Syn', 'Chap', 'Ub'])
 
-    parse_heatmap(avrg_exp, exp_chap, meta_clusters, "chap")
-    parse_heatmap(avrg_exp, exp_ub, meta_clusters, "ub")
+    hmap_chap = parse_heatmap(avrg_exp, exp_chap, meta_clusters, "chap")
+    hmap_ub = parse_heatmap(avrg_exp, exp_ub, meta_clusters, "ub")
     
+    summary_heatmap(hmap_chap, meta_clusters, "chap")
+    summary_heatmap(hmap_ub, meta_clusters, "ub")
+
     total_abundance_category(exp_chap, chap, "System", "chap")  
     total_abundance_category(exp_ub, ub, "Category", "ub")
