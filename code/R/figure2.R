@@ -9,7 +9,6 @@ library(viridis)
 
 
 
-setwd("M2/neuro/")
 
 
 # Figure 2A ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,7 +70,7 @@ plot.ub <- ggplot(data_ub, aes(x = variable, y = Gene)) +
     axis.ticks=element_blank() ) 
 
 
-svg(file = "figures/Figure2/A_heat.svg", height = 5, width = 5)
+#svg(file = "figures/Figure2/A_heat.svg", height = 5, width = 5)
 
 png(filename="figures/Figure2/A_heat.png", width=5, height=5, unit="in", res=1200)
 
@@ -93,12 +92,22 @@ top4.chap <- l2fc.chap[ sort(rowSums(l2fc.chap[,c(2:7)]), index.return=T)$ix[(nr
 top4.chap <- melt(top4.chap, id="X")
 top4.chap$cat <- c(rep("Exc", 8), rep("Inh", 8), rep("non", 8))   # need to check that still matchings labels after changes
 
+examples.chap <- l2fc.chap[c(which(l2fc.chap$X=="DNAJB13"), which(l2fc.chap$X=="FKBP5"), which(l2fc.chap$X=="HSPB9"), which(l2fc.chap$X=="ZMYND10")),]
+examples.chap <- melt(examples.chap, id="X")
+examples.chap$cat <- c(rep("Exc", 8), rep("Inh", 8), rep("non", 8))   # need to check that still matchings labels after changes
 
 
+* Hsp40 ER
+DNAJC5G Hsp40 ER
+DNAJC5B Hsp40 ER
+*FKBP5 coHsp90
+*HSPB9 sHsp
+ODF1 sHsp
+*ZMYND10 coHsp90
 
 svg(file = "figures/Figure2/B_2fold_chap.svg", height = 3.5, width = 3)
 
-ggplot(top4.chap) + 
+ggplot(examples.chap) + 
   geom_col(aes(x=cat, y=value, fill=variable), position=position_dodge2(),  show.legend=F) + 
   facet_grid(rows = vars(X)) +  # , scales='free_y'
   scale_fill_manual(values=c("gold", "blue", "gold", "blue", "gold", "blue")) + 
@@ -126,10 +135,14 @@ top4.ub <- l2fc.ub[ sort(rowSums(l2fc.ub[,c(2:7)]), index.return=T)$ix[(nrow(l2f
 top4.ub <- melt(top4.ub, id="X")
 top4.ub$cat <- c(rep("Exc", 8), rep("Inh", 8), rep("non", 8))   # need to check that still matchings labels after changes
 
+examples.ub <- l2fc.ub[c(which(l2fc.ub$X=="TRIM22"), which(l2fc.ub$X=="RNF135"), which(l2fc.ub$X=="FBXO40"), which(l2fc.ub$X=="KCTD11")),]
+examples.ub <- melt(examples.ub, id="X")
+examples.ub$cat <- c(rep("Exc", 8), rep("Inh", 8), rep("non", 8))   # need to check that still matchings labels after changes
+
 
 svg(file = "figures/Figure2/B_2fold_ub.svg", height = 3.5, width = 3)
 
-ggplot(top4.ub) + 
+ggplot(examples.ub) + 
   geom_col(aes(x=cat, y=value, fill=variable), position=position_dodge2(),  show.legend=F) + 
   facet_grid(rows = vars(X)) +  # , scales='free_y'
   scale_fill_manual(values=c("gold", "blue", "gold", "blue", "gold", "blue")) + 

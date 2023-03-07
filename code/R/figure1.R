@@ -6,7 +6,6 @@ library(reshape2)
 library(ggdendro)
 library(cowplot)
 
-setwd("M2/neuro/")
 
 
 # Figure 1A ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -8,7 +8,6 @@ library(cowplot)
 library(edgeR)
 
 
-setwd("M2/neuro/")
 
 
 

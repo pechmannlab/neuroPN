@@ -9,7 +9,6 @@ library(igraph)
 library(ggraph)
 
 
-setwd("M2/neuro/")
 
 
 # Figure 3A ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
