@@ -6,6 +6,7 @@ library(reshape2)
 library(ggdendro)
 library(cowplot)
 
+setwd("M2/neuro/")
 
 
 # Figure 1A ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -23,7 +24,7 @@ list_clusters <- unique(umap_data$subtype)
 cols_inh <- colorRampPalette(c("lightblue", "darkblue"))(length(grep("Inh", list_clusters)))
 cols_exc <- colorRampPalette(c("yellow", "red"))(length(grep("Exc", list_clusters)))
 cols_non <- colorRampPalette(c("grey80", "grey30"))(length(grep("non", list_clusters)))
-colos <- c(cols_inh, cols_exc, cols_non)
+colos <- c(cols_exc, cols_inh, cols_non)
 
 
 
@@ -240,5 +241,69 @@ ggplot(diffexp) +
   )
 
 dev.off()
+
+
+
+
+
+
+
+# Figure 1D ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# borrows variables from Fig 2!
+
+var.chap <- as.matrix(read.table("data/processed/variability_chap.txt"))
+exp.chap <- as.matrix(read.table("data/processed/expression_chap.txt")) 
+all( colnames(var.chap) == colnames(exp.chap) )
+
+meta.clusters <- read.delim("data/processed/meta_types_clusters.txt")
+
+
+
+type <- c()
+for (i in 1:ncol(var.chap)){
+  current_cluster <- colnames(var.chap)[i]
+  idx <-which(meta.clusters$cluster == current_cluster )
+  current_type <- meta.clusters$type[idx] 
+  current_type <- as.character(current_type)
+  if (current_type != "Exc" & current_type != "Inh"){
+    current_type <- "non"
+  }
+  type <- c(type, current_type )
+}
+
+
+cat.chap <- as.matrix(read.table("data/processed/abundance_bycategories_chap.txt"))
+cat.ub <- as.matrix(read.table("data/processed/abundance_bycategories_ub.txt"))
+cat.ch <- as.matrix(read.table("data/processed/abundance_bycategories_ch.txt"))
+cat.syn <- as.matrix(read.table("data/processed/abundance_bycategories_syn.txt"))
+
+
+df.all <- rbind(data.frame(total=colSums(cat.chap), type=type, cat=rep("Chap", length(type))), 
+                data.frame(total=colSums(cat.ub), type=type, cat=rep("Ub", length(type))),  
+                data.frame(total=as.numeric(cat.ch), type=type, cat=rep("Ch", length(type))), 
+                data.frame(total=as.numeric(cat.syn), type=type, cat=rep("Syn", length(type))) )
+df.all$cat <- factor(df.all$cat, levels=c("Ch", "Syn", "Chap", "Ub")) 
+
+
+svg(file = "figures/Figure1/D_totalexp.svg", height = 4, width = 2.2)
+
+ggplot(df.all) + 
+  geom_boxplot(aes(x=type, y=total, fill=type), show.legend=F) + 
+  facet_grid(rows = vars(cat), scales="free_y") +
+  scale_fill_manual(values=c("yellow", "#2988E2", "grey50")) +
+  labs(x="", y="Total expression") + 
+  theme_classic() + 
+  theme(
+    text = element_text(size=14),
+    axis.title.y = element_text(size=16), 
+    axis.line.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.x = element_text(size=16, angle=50, vjust = 0)
+  )
+
+dev.off()
+
+
+
 
 

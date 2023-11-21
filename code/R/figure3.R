@@ -9,6 +9,7 @@ library(igraph)
 library(ggraph)
 
 
+setwd("M2/neuro/")
 
 
 # Figure 3A ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -387,6 +388,5 @@ ggraph(graph_hsp90, layout=lay) +
   )
 
 dev.off()
-
 
 

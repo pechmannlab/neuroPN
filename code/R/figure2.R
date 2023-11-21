@@ -9,6 +9,7 @@ library(viridis)
 
 
 
+setwd("M2/neuro/")
 
 
 # Figure 2A ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -97,13 +98,7 @@ examples.chap <- melt(examples.chap, id="X")
 examples.chap$cat <- c(rep("Exc", 8), rep("Inh", 8), rep("non", 8))   # need to check that still matchings labels after changes
 
 
-* Hsp40 ER
-DNAJC5G Hsp40 ER
-DNAJC5B Hsp40 ER
-*FKBP5 coHsp90
-*HSPB9 sHsp
-ODF1 sHsp
-*ZMYND10 coHsp90
+
 
 svg(file = "figures/Figure2/B_2fold_chap.svg", height = 3.5, width = 3)
 
@@ -275,6 +270,7 @@ ggplot(cat.chap.m) +
 dev.off()
 
 
+# Figure 2E ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 cat.ub <- as.matrix(read.table("data/processed/abundance_bycategories_ub.txt"))
 #merge the RING single + complex data, omit the 'uncharacterized'
@@ -306,7 +302,9 @@ dev.off()
 
   
 
-# Figure 2E ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Figure 2F ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# requires "type" var from above
+
 
 cat.all <- as.matrix(read.table("data/processed/cluster_average_norm.txt", header=T))
 cat.chap <- as.matrix(read.table("data/processed/abundance_bycategories_chap.txt"))
@@ -351,7 +349,4 @@ svg(file = "figures/Figure2/E_pn_ecdf.svg", height = 4.5, width = 3.5)
 plot_grid(plot.pct, plot.ratio, labels ="", ncol = 1, align = 'v')
 
 dev.off()
-
-
-
 
