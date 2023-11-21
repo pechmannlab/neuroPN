@@ -437,16 +437,30 @@ def total_abundance_category(expIN, annoIN, selColumn, suffixOUT):
         selColumn: workaround for different column names in different annoIN dataframes ... 
     """
 
-    list_index = []
-    result_data = np.zeros(( len(list(set(annoIN[selColumn]))), np.shape(np.array(expIN))[1]  ))
-    for ix, i in enumerate( list(set(annoIN[selColumn])) ): 
-        current_genes = list(annoIN[annoIN[selColumn]==i]['Gene'])
+
+
+    if selColumn != "None":
+        list_index = []
+        result_data = np.zeros(( len(list(set(annoIN[selColumn]))), np.shape(np.array(expIN))[1]  ))
+        for ix, i in enumerate( list(set(annoIN[selColumn])) ): 
+            current_genes = list(annoIN[annoIN[selColumn]==i]['Gene'])
+            list_genes = []
+            for j in current_genes:
+                if j in list(expIN.index):
+                    list_genes.append(j)
+            list_index.append(i)
+            result_data[ix,:] = np.sum( np.array(expIN.loc[list_genes]), 0) #/ len(list_genes)
+
+    else:       # annoIN is only genelist, not DF
+        result_data = np.zeros(( 1, np.shape(np.array(expIN))[1]  ))   
+        list_index = ["all"]
         list_genes = []
-        for j in current_genes:
+        for j in annoIN:
             if j in list(expIN.index):
                 list_genes.append(j)
-        list_index.append(i)
-        result_data[ix,:] = np.sum( np.array(expIN.loc[list_genes]), 0) #/ len(list_genes)
+        result_data[0,:] = np.sum( np.array(expIN.loc[list_genes]), 0) #/ len(list_genes)
+
+
 
     resultDF = pd.DataFrame(data=result_data, index=list_index, columns=expIN.columns)
     resultDF.to_csv("../data/processed/abundance_bycategories_"+str(suffixOUT)+".txt", header=True, index=True, sep='\t')
@@ -487,6 +501,8 @@ if __name__ == '__main__':
         if i not in list_channels and i not in list_chap and i not in list_ub:
             list_synapse.append(i)
 
+
+
     ## LOAD EXP DATA
     avrg_exp = pd.read_csv("../data/processed/cluster_average_norm.txt", header=0, index_col=0, sep='\t')
     variab = pd.read_csv("../data/processed/cluster_variable.txt", header=0, index_col=0, sep='\t')
@@ -507,3 +523,5 @@ if __name__ == '__main__':
 
     total_abundance_category(exp_chap, chap, "System", "chap")  
     total_abundance_category(exp_ub, ub, "Category", "ub")
+    total_abundance_category(exp_channels, list_channels, "None", "ch")
+    total_abundance_category(exp_synapse, list_synapse, "None", "syn")
